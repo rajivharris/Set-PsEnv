@@ -1,0 +1,2 @@
+# psEnv
+PowerShell Environment Switcher
