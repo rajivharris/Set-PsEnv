@@ -1,3 +1,4 @@
+$localEnvFile = ".\.env"
 <#
 .Synopsis
 Exports environment variable from the .env file to the current process.
@@ -16,21 +17,27 @@ it loads the environment variable mentioned in the file to the current process.
      Set-PsEnv
  }
 #>
-function Set-PsEnv () {
-    $localEnvFile = ".\.env"
+function Set-PsEnv {
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Low')]
+    param()
 
     #return if no env file
-    if (!( Test-Path $localEnvFile)) {return}
+    if (!( Test-Path $localEnvFile)) {
+        Write-Verbose "No .env file"
+        return
+    }
 
     #read the local env file
     $content = Get-Content $localEnvFile -ErrorAction Stop
+    Write-Verbose "Parsed .env file"
 
     #load the content to environment
     foreach ($line in $content) {
         $kvp = $line -split "="
-        [Environment]::SetEnvironmentVariable($kvp[0], $kvp[1], "Process") | Out-Null
-        if ($env:DEBUGPSENV -eq "true") {
-            [Environment]::GetEnvironmentVariable($kvp[0], "Process")
+        if ($PSCmdlet.ShouldProcess("$($kvp[0])", "set value $($kvp[1])")) {
+            [Environment]::SetEnvironmentVariable($kvp[0], $kvp[1], "Process") | Out-Null
         }
     }
 }
+
+Export-ModuleMember -Function Set-PsEnv
