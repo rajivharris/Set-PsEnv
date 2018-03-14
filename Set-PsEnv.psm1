@@ -1,6 +1,21 @@
-#Load .env file from the current directory
-#Add support for common definition files
-#Add support for variable expansion
+<#
+.Synopsis
+Exports environment variable from the .env file to the current process.
+
+.Description
+This function looks for .env file in the current directoty, if present
+it loads the environment variable mentioned in the file to the current process.
+
+.Example
+ Set-PsEnv
+
+.Example
+ # This is function is called by convention in PowerShell
+ # Auto exports the env variable at every prompt change
+ function prompt {
+     Set-PsEnv
+ }
+#>
 function Set-PsEnv () {
     $localEnvFile = ".\.env"
 
