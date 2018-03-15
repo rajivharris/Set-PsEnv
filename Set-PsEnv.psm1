@@ -40,4 +40,4 @@ function Set-PsEnv {
     }
 }
 
-Export-ModuleMember -Function Set-PsEnv
+Export-ModuleMember -Function @('Set-PsEnv')
