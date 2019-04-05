@@ -33,7 +33,7 @@ function Set-PsEnv {
 
     #load the content to environment
     foreach ($line in $content) {
-        $kvp = $line -split "="
+        $kvp = $line -split "=",2
         if ($PSCmdlet.ShouldProcess("$($kvp[0])", "set value $($kvp[1])")) {
             [Environment]::SetEnvironmentVariable($kvp[0], $kvp[1], "Process") | Out-Null
         }
