@@ -12,7 +12,7 @@ it loads the environment variable mentioned in the file to the current process.
 
 .Example
  # This is function is called by convention in PowerShell
- # Auto exports the env variable at every prompt change
+ # Auto imports the env variable at every prompt change
  function prompt {
      Set-PsEnv
  }
