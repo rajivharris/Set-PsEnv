@@ -18,6 +18,17 @@ function prompt {
     Set-PsEnv
 }
 ```
+Create a .env file at the folder level the environment variable has to be exported   
+Sample .env file
+```powershell
+#This is a comment
+#Prefix to a variable
+PATH := c:\test
+#Append to a variable
+PATH =: c:\suffix\bin
+#Assign a variable
+PYTHON=c:\python
+```
 Installation
 ============
 
