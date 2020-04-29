@@ -6,7 +6,7 @@ on:
 jobs:
   publish:    
     name: Set-PsEnv Deployment
-    runs-on: ubuntu-18.04
+    runs-on: windows-2019
     steps:
     - uses: actions/checkout@v1
     - name: Deploy to PSGallery
