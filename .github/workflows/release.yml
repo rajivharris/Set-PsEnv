@@ -12,5 +12,4 @@ jobs:
     - name: Deploy to PSGallery
       env:
         PSGALLERY_TOKEN: ${{secrets.PowershellGallery}}        
-      run: .github\workflows\Deploy.ps1
-      shell: powershell
+      run: powershell .github\workflows\Deploy.ps1
