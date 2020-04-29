@@ -67,17 +67,17 @@ function Set-PsEnv {
         if($line -like "*:=*"){
             Write-Verbose "Prefix"
             $kvp = $line -split ":=",2
-            $cmd = '$Env:{0} = "{1};$Env:{0}"' -f $kvp[0],$kvp[1]
+            $cmd = '$Env:{0} = "{1};$Env:{0}"' -f $kvp[0].Trim(),$kvp[1].Trim()
         }
         elseif ($line -like "*=:*"){
             Write-Verbose "Suffix"
             $kvp = $line -split "=:",2
-            $cmd = '$Env:{0} += ";{1}"' -f $kvp[0],$kvp[1]
+            $cmd = '$Env:{0} += ";{1}"' -f $kvp[0].Trim(),$kvp[1].Trim()
         }
         else {
             Write-Verbose "Assign"
             $kvp = $line -split "=",2
-            $cmd = '$Env:{0} = "{1}"' -f $kvp[0],$kvp[1]
+            $cmd = '$Env:{0} = "{1}"' -f $kvp[0].Trim(),$kvp[1].Trim()
         }
 
         Write-Verbose $cmd
