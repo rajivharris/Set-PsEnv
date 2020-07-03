@@ -66,24 +66,27 @@ function Set-PsEnv {
         #get the operator
         if($line -like "*:=*"){
             Write-Verbose "Prefix"
-            $kvp = $line -split ":=",2
-            $cmd = '$Env:{0} = "{1};$Env:{0}"' -f $kvp[0].Trim(),$kvp[1].Trim()
+            $kvp = $line -split ":=",2            
+            $key = $kvp[0].Trim()
+            $value = "{0};{1}" -f  $kvp[1].Trim(),[System.Environment]::GetEnvironmentVariable($key)
         }
         elseif ($line -like "*=:*"){
             Write-Verbose "Suffix"
-            $kvp = $line -split "=:",2
-            $cmd = '$Env:{0} += ";{1}"' -f $kvp[0].Trim(),$kvp[1].Trim()
+            $kvp = $line -split "=:",2            
+            $key = $kvp[0].Trim()
+            $value = "{1};{0}" -f  $kvp[1].Trim(),[System.Environment]::GetEnvironmentVariable($key)
         }
         else {
             Write-Verbose "Assign"
-            $kvp = $line -split "=",2
-            $cmd = '$Env:{0} = "{1}"' -f $kvp[0].Trim(),$kvp[1].Trim()
+            $kvp = $line -split "=",2            
+            $key = $kvp[0].Trim()
+            $value = $kvp[1].Trim()
         }
 
-        Write-Verbose $cmd
+        Write-Verbose "$key=$value"
         
-        if ($PSCmdlet.ShouldProcess("$($cmd)", "Execute")) {
-            Invoke-Expression $cmd
+        if ($PSCmdlet.ShouldProcess("environment variable $key", "set value $value")) {            
+            [Environment]::SetEnvironmentVariable($key, $value, "Process") | Out-Null
         }
     }
 }
