@@ -100,7 +100,7 @@ function Set-PsEnv {
         }
     }
 
-    Write-Verbose "Parsed $localEnvFile file."
+    Write-Verbose "Parsed $localEnvFile file, exiting."
 }
 
 Export-ModuleMember -Function @('Set-PsEnv')
