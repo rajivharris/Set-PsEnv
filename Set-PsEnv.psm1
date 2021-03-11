@@ -49,8 +49,8 @@ function Set-PsEnv {
             Write-Output "No $localEnvFile file, exiting."
         } else {
             Write-Verbose "No $localEnvFile file, exiting."
-            return
         }
+        return
     }
 
     #read the local env file
