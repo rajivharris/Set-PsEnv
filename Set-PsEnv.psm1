@@ -1,4 +1,4 @@
-$localEnvFile = ".\.env"
+$localEnvFiles = ".env", ".envrc"
 <#
 .Synopsis
 Exports environment variable from the .env file to the current process.
@@ -33,20 +33,22 @@ function Set-PsEnv {
     param(
          [switch] $reload
     )
+    $scriptName = $MyInvocation.MyCommand
 
     if(!$reload) {
         if($Global:PreviousDir -eq (Get-Location).Path){
-            Write-Verbose "Set-PsEnv:Skipping same dir"
+            Write-Verbose "Skipping same dir"
             return
         } else {
             $Global:PreviousDir = (Get-Location).Path
         }
     }
 
+    $localEnvFile = $localEnvFiles.Where({ Test-Path $_ })
     #return if no env file
-    if (!( Test-Path $localEnvFile)) {
+    if (!$localEnvFile) {
         if($reload) {
-            Write-Output "No $localEnvFile file, exiting."
+            Write-Output "${scriptName}: No $localEnvFile file, exiting."
         } else {
             Write-Verbose "No $localEnvFile file, exiting."
         }
@@ -55,8 +57,9 @@ function Set-PsEnv {
 
     #read the local env file
     $content = Get-Content $localEnvFile -ErrorAction Stop
-    Write-Verbose "Parsing $localEnvFile file"
+    Write-Verbose "${scriptName}: Loading $localEnvFile ..."
 
+    $keys = @()
     #load the content to environment
     foreach ($line in $content) {
 
@@ -94,13 +97,14 @@ function Set-PsEnv {
         $key = $key.replace('export ', '').Trim()
 
         Write-Verbose "$key=$value"
-        
+        $keys += $key
+
         if ($PSCmdlet.ShouldProcess("environment variable $key", "set value $value")) {            
             [Environment]::SetEnvironmentVariable($key, $value, "Process") | Out-Null
         }
     }
 
-    Write-Verbose "Parsed $localEnvFile file, exiting."
+    Write-Output "${scriptName}: Set $localEnvFile Env variables: $keys"
 }
 
 Export-ModuleMember -Function @('Set-PsEnv')
