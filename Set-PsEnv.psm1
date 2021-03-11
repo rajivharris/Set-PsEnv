@@ -30,12 +30,27 @@ it loads the environment variable mentioned in the file to the current process.
 #>
 function Set-PsEnv {
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Low')]
-    param()
+    param(
+         [switch] $reload
+    )
+
+    if(!$reload) {
+        if($Global:PreviousDir -eq (Get-Location).Path){
+            Write-Verbose "Set-PsEnv:Skipping same dir"
+            return
+        } else {
+            $Global:PreviousDir = (Get-Location).Path
+        }
+    }
 
     #return if no env file
     if (!( Test-Path $localEnvFile)) {
-        Write-Output "No $localEnvFile file"
-        return
+        if($reload) {
+            Write-Output "No $localEnvFile file, exiting."
+        } else {
+            Write-Verbose "No $localEnvFile file, exiting."
+            return
+        }
     }
 
     #read the local env file
