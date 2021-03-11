@@ -1,4 +1,4 @@
-$localEnvFile = ".\.env"
+$localEnvFiles = ".env", ".envrc"
 <#
 .Synopsis
 Exports environment variable from the .env file to the current process.
@@ -30,25 +30,36 @@ it loads the environment variable mentioned in the file to the current process.
 #>
 function Set-PsEnv {
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Low')]
-    param()
+    param(
+         [switch] $reload
+    )
+    $scriptName = $MyInvocation.MyCommand
 
-    if($Global:PreviousDir -eq (Get-Location).Path){
-        Write-Verbose "Set-PsEnv:Skipping same dir"
-        return
-    } else {
-        $Global:PreviousDir = (Get-Location).Path
+    if(!$reload) {
+        if($Global:PreviousDir -eq (Get-Location).Path){
+            Write-Verbose "Skipping same dir"
+            return
+        } else {
+            $Global:PreviousDir = (Get-Location).Path
+        }
     }
 
+    $localEnvFile = $localEnvFiles.Where({ Test-Path $_ })
     #return if no env file
-    if (!( Test-Path $localEnvFile)) {
-        Write-Verbose "No .env file"
+    if (!$localEnvFile) {
+        if($reload) {
+            Write-Output "${scriptName}: No $localEnvFile file, exiting."
+        } else {
+            Write-Verbose "No $localEnvFile file, exiting."
+        }
         return
     }
 
     #read the local env file
     $content = Get-Content $localEnvFile -ErrorAction Stop
-    Write-Verbose "Parsed .env file"
+    Write-Verbose "${scriptName}: Loading $localEnvFile ..."
 
+    $keys = @()
     #load the content to environment
     foreach ($line in $content) {
 
@@ -66,29 +77,34 @@ function Set-PsEnv {
         #get the operator
         if($line -like "*:=*"){
             Write-Verbose "Prefix"
-            $kvp = $line -split ":=",2            
+            $kvp = $line -split ":=",2
             $key = $kvp[0].Trim()
             $value = "{0};{1}" -f  $kvp[1].Trim(),[System.Environment]::GetEnvironmentVariable($key)
         }
         elseif ($line -like "*=:*"){
             Write-Verbose "Suffix"
-            $kvp = $line -split "=:",2            
+            $kvp = $line -split "=:",2
             $key = $kvp[0].Trim()
             $value = "{1};{0}" -f  $kvp[1].Trim(),[System.Environment]::GetEnvironmentVariable($key)
         }
         else {
             Write-Verbose "Assign"
-            $kvp = $line -split "=",2            
+            $kvp = $line -split "=",2
             $key = $kvp[0].Trim()
             $value = $kvp[1].Trim()
         }
 
+        $key = $key.replace('export ', '').Trim()
+
         Write-Verbose "$key=$value"
-        
+        $keys += $key
+
         if ($PSCmdlet.ShouldProcess("environment variable $key", "set value $value")) {            
             [Environment]::SetEnvironmentVariable($key, $value, "Process") | Out-Null
         }
     }
+
+    Write-Output "${scriptName}: Set $localEnvFile Env variables: $keys"
 }
 
 Export-ModuleMember -Function @('Set-PsEnv')
