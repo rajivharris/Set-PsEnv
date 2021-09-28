@@ -34,7 +34,7 @@ function Set-PsEnv {
         [string]$specifiedEnvFile
     )
     if (!(Test-Path $specifiedEnvFile)) {
-        Write-Verbose ("{0} doesn't exist" -f $specifiedEnvFile)
+        Write-Verbose "$specifiedEnvFile doesn't exist"
         return
     }
     $localEnvFile = $specifiedEnvFile
