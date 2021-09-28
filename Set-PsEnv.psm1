@@ -1,4 +1,6 @@
-$localEnvFile = ".\.env"
+param(
+    [string]$localEnvFile = ".\.env"
+)
 <#
 .Synopsis
 Exports environment variable from the .env file to the current process.
