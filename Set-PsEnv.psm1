@@ -33,11 +33,11 @@ function Set-PsEnv {
     param(
         [string]$specifiedEnvFile
     )
-    if (!(Test-Path $specifiedEnvFile)) {
-        Write-Verbose "$specifiedEnvFile doesn't exist"
-        return
+    $localEnvFile = ".\.env"
+
+    if (Test-Path $specifiedEnvFile) {
+        $localEnvFile = $specifiedEnvFile
     }
-    $localEnvFile = $specifiedEnvFile
 
     if($Global:PreviousDir -eq (Get-Location).Path){
         Write-Verbose "Set-PsEnv:Skipping same dir"
